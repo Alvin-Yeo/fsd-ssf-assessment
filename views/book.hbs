@@ -1,0 +1,57 @@
+<header>
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col d-flex justify-content-between">
+                <h1>Book Details</h1>
+                <div class="align-self-center">
+                    <a href="/" class="btn btn-primary">Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="row mt-3">
+            {{#if hasContent}}
+            <div class="col-md-4 mt-3">
+                <div>
+                    <img src="{{ book.image_url }}" alt="Book Cover">
+                </div>
+                <div class="mt-3">
+                    <p>Pages: {{ book.pages }}</p>
+                </div>
+                <div>
+                    <p>Rating: {{ book.rating }} ({{ book.rating_count }})</p>
+                </div>
+                <div>
+                    <p>Genres: {{ genres }}</p>  
+                </div>
+            </div>
+            <div class="col-md-8 mt-3">
+                <div>
+                    <h1>{{ book.title }}</h1>
+                </div>
+                <div>
+                    <h2>by <em>{{ authors }}</em></h2>
+                </div>
+                <div>
+                    <p>{{ book.description }}</p>
+                </div>
+                <div>
+                    <form action="/review" method="GET">
+                        <input type="hidden" name="title" value="{{ book.title }}">
+                        <input type="hidden" name="author" value="{{ authors }}">
+                        <button type="submit" class="btn btn-primary float-right">Find Review</button>
+                    </form>
+                </div>
+            </div>
+            {{else}}
+            <div class="col">
+                <p>Sorry! No info found for the selected book.</p>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</main>

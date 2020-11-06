@@ -1,0 +1,20 @@
+.container {
+    max-width: 800px;
+}
+
+.btn-letter {
+    display: inline-block;
+    width: 70px;
+    margin-right: 10px;
+}
+
+.books_list {
+    list-style-type: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
