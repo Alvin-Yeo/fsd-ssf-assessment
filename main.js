@@ -49,21 +49,27 @@ app.get(['/', 'index.html'], (req, res) => {
 // get book list by letter
 app.get('/search/:letter', async(req,res) => {
     const letter = req.params.letter;
-    const offset = req.query.offset || 0;
+    const offset = parseInt(req.query.offset) || 0;
+    // console.log('>>> letter: ', letter);
+    // console.log('>>> offset: ', offset);
+
+    const prevOffset = Math.max(0, offset - SQL_LIMIT);
+    const nextOffset = offset + SQL_LIMIT;
 
     const conn = await pool.getConnection();
 
     try {
-        const [ result, _ ] = await conn.query(SQL_TOTAL_BOOKS_BY_LETTER, [ `${letter}%`]);
+        const [ result, _ ] = await conn.query(SQL_TOTAL_BOOKS_BY_LETTER, [ `${letter}%` ]);
         const numOfBooks = result[0].total;
 
         let books;
+        let maxPage;
         
         if(numOfBooks > 0) {
-            const maxPage = Math.floor((numOfBooks / SQL_LIMIT) - 0.01) + 1;
+            maxPage = Math.floor((numOfBooks / SQL_LIMIT) - 0.01) + 1;
             // console.log('>>> maxPage: ', maxPage);
 
-            [ books, __ ] = await conn.query(SQL_GET_BOOKS_BY_LETTER, [ `${letter}%`, SQL_LIMIT, offset]);
+            [ books, __ ] = await conn.query(SQL_GET_BOOKS_BY_LETTER, [ `${letter}%`, SQL_LIMIT, offset ]);
             
         } 
 
@@ -72,7 +78,11 @@ app.get('/search/:letter', async(req,res) => {
         res.render('list', { 
             letter: letter.toUpperCase(),
             hasContent: !!numOfBooks,
-            books
+            books,
+            firstPage: (offset === 0) ? 'disabled' : '',
+            lastPage: (nextOffset >= maxPage * SQL_LIMIT) ? 'disabled' : '',
+            prevOffset,
+            nextOffset
         });
     } catch(e) {
         res.status(500);
@@ -117,12 +127,12 @@ app.get('/book/:id', async(req, res) => {
                     res.json({
                         bookId: book[0].book_id,
                         title: book[0].title,
-                        authors: book[0].authors,
+                        authors: book[0].authors.split("|"),
                         summary: book[0].description,
                         pages: book[0].pages,
                         rating: book[0].rating,
                         ratingCount: book[0].rating_count,
-                        genre: book[0].genres
+                        genre: book[0].genres.split("|")
                     });
                 } else {
                     res.type('application/json');
